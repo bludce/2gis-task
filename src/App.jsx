@@ -153,7 +153,9 @@ class App extends PureComponent {
     let books = this.filterBooks(activeFilter)
     let arr = books.items.filter((book) => book.tags.some((el) => {
       return filters.includes(el)
-    }) )   
+    }) )  
+    
+    console.log(arr)
   }
 
 
