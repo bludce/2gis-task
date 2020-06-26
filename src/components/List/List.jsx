@@ -3,7 +3,7 @@ import './List.sass'
 
 import Item from '../Item/Item'
 
-const List = ({ books, setInProgress, setInDone, setReturnToRead, inProgress, done }) => {
+const List = ({ books, setInProgress, setInDone, setReturnToRead, inProgress, done, setFilters }) => {
 
   const {items = []} = books
 
@@ -21,6 +21,7 @@ const List = ({ books, setInProgress, setInDone, setReturnToRead, inProgress, do
         setReturnToRead={setReturnToRead}
         inProgress={inProgress}
         done={done}
+        setFilters={setFilters}
       />
     )
   });

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import { BrowserRouter, Route, NavLink, Switch } from 'react-router-dom';
-
 import './index.sass';
 
 import List from './components/List/List'
@@ -17,7 +16,8 @@ class App extends PureComponent {
     done: {
       items: []
     },
-    activeFilter: ''
+    activeFilter: '',
+    filters: []
   }
 
   componentDidMount = async() => {
@@ -70,7 +70,7 @@ class App extends PureComponent {
     }
   }
 
-  filterBooks = (books, activeFilter) => {
+  filterBooks = (activeFilter) => {
     switch(activeFilter) {
       case 'inProgress':
         return this.state.inProgress;
@@ -79,7 +79,7 @@ class App extends PureComponent {
         return this.state.done;
         break;
       default:
-        return books
+        return this.state.books
     }
   }
 
@@ -103,9 +103,7 @@ class App extends PureComponent {
         items: this.state.books.items.filter(item => item.id !== book.id)
       }
     })
-
-    const {books, inProgress, done, activeFilter} = this.state
-
+    
   }
 
   setInDone = (book) => {
@@ -141,11 +139,25 @@ class App extends PureComponent {
 
   }
 
+  setFilters = (name) => {
+    const {filters, activeFilter } = this.state
+
+    this.setState({
+      filters: Array.from(new Set([...filters, name]))
+    })
+
+    let books = this.filterBooks(activeFilter)
+    let arr = books.items.filter((book) => book.tags.some((el) => {
+      return filters.includes(el)
+    }) )   
+  }
+
+
   render() {
 
     const {books, inProgress, done, activeFilter} = this.state
 
-    const filteredBooks = this.filterBooks(books, activeFilter)
+    const filteredBooks = this.filterBooks(activeFilter)
 
     const lenghtBooks = books.items.length
     const lenghtInProgressBooks = inProgress.items.length
@@ -192,6 +204,7 @@ class App extends PureComponent {
                       setInProgress={this.setInProgress} 
                       setInDone={this.setInDone} 
                       setReturnToRead={this.setReturnToRead}
+                      setFilters={this.setFilters}
                     />
               }/>
               <Route path='/inprogress' render={
@@ -201,6 +214,7 @@ class App extends PureComponent {
                       setInDone={this.setInDone} 
                       setReturnToRead={this.setReturnToRead} 
                       inProgress={true}
+                      setFilters={this.setFilters}
                     />
               }/>
               <Route path='/done' render={
@@ -210,6 +224,7 @@ class App extends PureComponent {
                       setInDone={this.setInDone} 
                       setReturnToRead={this.setReturnToRead} 
                       done={true}
+                      setFilters={this.setFilters}
                     />
               }/>
             </Switch>
