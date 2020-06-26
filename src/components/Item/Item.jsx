@@ -1,8 +1,7 @@
 import React from 'react';
 import './Item.sass'
 
-const RepoItem = ({ id, author, title, description, tags, setInProgress, setInDone, setReturnToRead }) => {
-
+const RepoItem = ({ id, author, title, description, tags, setInProgress, setInDone, setReturnToRead, inProgress, done }) => {
   return (
     <div className="book-list__item item">
       <div className="item__author">{author}</div>
@@ -11,9 +10,9 @@ const RepoItem = ({ id, author, title, description, tags, setInProgress, setInDo
         <div className="item__title">
           {title}
         </div>
-        <div className="btn" onClick={()=>setInProgress({id, author, title, description, tags})}>Start Reading</div>
-        <div className="btn" onClick={()=>setInDone({id, author, title, description, tags})}>Finish reading</div>
-        <div className="btn" onClick={()=>setReturnToRead({id, author, title, description, tags})}>Return in to read</div>
+        {!inProgress && !done ? <div className="btn" onClick={()=>setInProgress({id, author, title, description, tags})}>Start Reading</div> :''}
+        {inProgress ? <div className="btn" onClick={()=>setInDone({id, author, title, description, tags})}>Finish reading</div> : ''}
+        {done ? <div className="btn" onClick={()=>setReturnToRead({id, author, title, description, tags})}>Return in to read</div>: ''}
       </div>
 
       <div className="item__description">{description}</div>

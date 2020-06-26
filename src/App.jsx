@@ -8,7 +8,9 @@ import List from './components/List/List'
 class App extends PureComponent {
 
   state = {
-    books: {},
+    books: {
+      items: []
+    },
     inProgress: {
       items: []
     },
@@ -105,29 +107,50 @@ class App extends PureComponent {
 
   render() {
 
-    const {books, activeFilter} = this.state
+    const {books, inProgress, done, activeFilter} = this.state
 
     const filteredBooks = this.filterBooks(books, activeFilter)
+
+    const lenghtBooks = books.items.length
+    const lenghtInProgressBooks = inProgress.items.length
+    const lenghtInDoneBooks = done.items.length
 
     return (
       <BrowserRouter>
         <div className="tabs container">
           <div className="tabs__links">
-            <NavLink to={`/`} className="tabs__link" onClick={()=>this.setActiveFilter('')}>To read</NavLink>
-            <NavLink to={`?tab=inprogress`} className="tabs__link" onClick={()=>this.setActiveFilter('inProgress')}>In progress</NavLink>
-            <NavLink to={`?tab=done`} className="tabs__link" onClick={()=>this.setActiveFilter('done')}>Done</NavLink>
+            <NavLink to={`/`} className="tabs__link" onClick={()=>this.setActiveFilter('')}>To read ({lenghtBooks})</NavLink>
+            <NavLink to={`/inprogress`} className="tabs__link" onClick={()=>this.setActiveFilter('inProgress')}>In progress ({lenghtInProgressBooks})</NavLink>
+            <NavLink to={`/done`} className="tabs__link" onClick={()=>this.setActiveFilter('done')}>Done ({lenghtInDoneBooks})</NavLink>
           </div>
           
           <div className="tabs__content">
             <Switch>
               <Route path='/' exact render={
-                ()=><List books={filteredBooks} setInProgress={this.setInProgress} setInDone={this.setInDone} setReturnToRead={this.setReturnToRead}/>
+                ()=><List 
+                      books={filteredBooks} 
+                      setInProgress={this.setInProgress} 
+                      setInDone={this.setInDone} 
+                      setReturnToRead={this.setReturnToRead}
+                    />
               }/>
-              <Route path='?tab=inprogress' render={
-                ()=><List books={filteredBooks} />
+              <Route path='/inprogress' render={
+                ()=><List 
+                      books={filteredBooks} 
+                      setInProgress={this.setInProgress} 
+                      setInDone={this.setInDone} 
+                      setReturnToRead={this.setReturnToRead} 
+                      inProgress={true}
+                    />
               }/>
-              <Route path='?tab=done`' render={
-                ()=><List books={filteredBooks} />
+              <Route path='/done' render={
+                ()=><List 
+                      books={filteredBooks} 
+                      setInProgress={this.setInProgress} 
+                      setInDone={this.setInDone} 
+                      setReturnToRead={this.setReturnToRead} 
+                      done={true}
+                    />
               }/>
             </Switch>
           </div>
