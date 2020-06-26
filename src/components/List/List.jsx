@@ -3,8 +3,8 @@ import './List.sass'
 
 import Item from '../Item/Item'
 
-const List = ({ books }) => {
-  
+const List = ({ books, setInProgress, setInDone, setReturnToRead }) => {
+
   const {items = []} = books
 
   const booksItems = items.map((book) => {
@@ -16,12 +16,15 @@ const List = ({ books }) => {
         title={book.title}
         description={book.description}
         tags={book.tags}
+        setInProgress={setInProgress}
+        setInDone={setInDone}
+        setReturnToRead={setReturnToRead}
       />
     )
   });
 
   return (
-    <div className="book-list">{booksItems}</div>
+    <div className="book-list">{booksItems.length ? booksItems : <div className="empty">List is empty</div>}</div>
   );
 
 }

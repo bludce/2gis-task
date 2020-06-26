@@ -8,7 +8,14 @@ import List from './components/List/List'
 class App extends PureComponent {
 
   state = {
-    books: {}
+    books: {},
+    inProgress: {
+      items: []
+    },
+    done: {
+      items: []
+    },
+    activeFilter: ''
   }
 
   componentDidMount = () => {
@@ -29,29 +36,98 @@ class App extends PureComponent {
     }
   }
 
+  filterBooks = (books, activeFilter) => {
+    switch(activeFilter) {
+      case 'inProgress':
+        return this.state.inProgress;
+        break;
+      case 'done':
+        return this.state.done;
+        break;
+      default:
+        return books
+    }
+  }
+
+  setActiveFilter = (activeFilter) => {
+    this.setState({
+      activeFilter
+    })
+  }
+
+  setInProgress = (book) => {
+    const {items} = this.state.inProgress
+
+    this.setState({
+      inProgress: {
+        items: [...items, book]
+      }
+    })
+
+    this.setState({
+      books: {
+        items: this.state.books.items.filter(item => item.id !== book.id)
+      }
+    })
+  }
+
+  setInDone = (book) => {
+    const {items} = this.state.done
+    
+    this.setState({
+      done: {
+        items: [...items, book]
+      }
+    })
+
+    this.setState({
+      inProgress: {
+        items: this.state.inProgress.items.filter(item => item.id !== book.id)
+      }
+    })
+  }
+
+  setReturnToRead = (book) => {
+    const {items} = this.state.books
+
+    this.setState({
+      books: {
+        items: [...items, book]
+      }
+    })
+
+    this.setState({
+      done: {
+        items: this.state.done.items.filter(item => item.id !== book.id)
+      }
+    })
+  }
+
   render() {
 
-    const {books} = this.state
+    const {books, activeFilter} = this.state
+
+    const filteredBooks = this.filterBooks(books, activeFilter)
 
     return (
       <BrowserRouter>
         <div className="tabs container">
           <div className="tabs__links">
-            <NavLink to={`/`} className="tabs__link">To read</NavLink>
-            <NavLink to={`?tab=inprogress`} className="tabs__link" >In progress</NavLink>
-            <NavLink to={`?tab=done`} className="tabs__link">Done</NavLink>
+            <NavLink to={`/`} className="tabs__link" onClick={()=>this.setActiveFilter('')}>To read</NavLink>
+            <NavLink to={`?tab=inprogress`} className="tabs__link" onClick={()=>this.setActiveFilter('inProgress')}>In progress</NavLink>
+            <NavLink to={`?tab=done`} className="tabs__link" onClick={()=>this.setActiveFilter('done')}>Done</NavLink>
           </div>
           
           <div className="tabs__content">
             <Switch>
               <Route path='/' exact render={
-                ()=><List books={books}/>
+                ()=><List books={filteredBooks} setInProgress={this.setInProgress} setInDone={this.setInDone} setReturnToRead={this.setReturnToRead}/>
               }/>
               <Route path='?tab=inprogress' render={
-                ()=><List books={books}/>
+                ()=><List books={filteredBooks} />
               }/>
               <Route path='?tab=done`' render={
-                ()=><List books={books}/>
+                ()=><List books={filteredBooks} />
               }/>
             </Switch>
           </div>
