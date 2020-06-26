@@ -20,8 +20,40 @@ class App extends PureComponent {
     activeFilter: ''
   }
 
-  componentDidMount = () => {
-    this.loadPage('https://raw.githubusercontent.com/lastw/test-task/master/data/10-items.json')
+  componentDidMount = async() => {
+    const booksLocal = localStorage.getItem('books') !== null ? JSON.parse(localStorage.getItem('books')) : {};
+    const inProgressLocal = localStorage.getItem('inProgress') !== null ? JSON.parse(localStorage.getItem('inProgress')) : {};
+    const doneLocal = localStorage.getItem('done') !== null ? JSON.parse(localStorage.getItem('done')) : {};
+    const activeFilterLocal = localStorage.getItem('activeFilter') !== null ? JSON.parse(localStorage.getItem('activeFilter')) : {};
+
+    if (localStorage.getItem('books') !== null 
+        && localStorage.getItem('inProgress') !== null 
+        && localStorage.getItem('done') !== null 
+        && localStorage.getItem('activeFilter') !== null) {
+      this.setState({
+        books: {
+          items: booksLocal
+        },
+        inProgress: {
+          items: inProgressLocal
+        },
+        done: {
+          items: doneLocal
+        },
+        activeFilter: activeFilterLocal
+      })
+    } else {
+      await this.loadPage('https://raw.githubusercontent.com/lastw/test-task/master/data/10-items.json')
+    }    
+  }
+
+  componentDidUpdate = () => {
+    const {books, inProgress, done, activeFilter} = this.state
+
+    localStorage.setItem('books', JSON.stringify(books.items));
+    localStorage.setItem('inProgress', JSON.stringify(inProgress.items));
+    localStorage.setItem('done', JSON.stringify(done.items));
+    localStorage.setItem('activeFilter', JSON.stringify(activeFilter));
   }
 
   loadPage = async (url) => {
@@ -71,6 +103,9 @@ class App extends PureComponent {
         items: this.state.books.items.filter(item => item.id !== book.id)
       }
     })
+
+    const {books, inProgress, done, activeFilter} = this.state
+
   }
 
   setInDone = (book) => {
@@ -103,6 +138,7 @@ class App extends PureComponent {
         items: this.state.done.items.filter(item => item.id !== book.id)
       }
     })
+
   }
 
   render() {
@@ -119,9 +155,33 @@ class App extends PureComponent {
       <BrowserRouter>
         <div className="tabs container">
           <div className="tabs__links">
-            <NavLink to={`/`} className="tabs__link" onClick={()=>this.setActiveFilter('')}>To read ({lenghtBooks})</NavLink>
-            <NavLink to={`/inprogress`} className="tabs__link" onClick={()=>this.setActiveFilter('inProgress')}>In progress ({lenghtInProgressBooks})</NavLink>
-            <NavLink to={`/done`} className="tabs__link" onClick={()=>this.setActiveFilter('done')}>Done ({lenghtInDoneBooks})</NavLink>
+            <NavLink 
+              to={`/`} 
+              className="tabs__link" 
+              onClick={()=>this.setActiveFilter('')}
+              activeClassName="tabs__link--active"
+              exact
+            >
+              To read ({lenghtBooks})
+            </NavLink>
+            <NavLink 
+              to={`/inprogress`} 
+              className="tabs__link" 
+              onClick={()=>this.setActiveFilter('inProgress')}
+              activeClassName="tabs__link--active"
+              exact
+            >
+              In progress ({lenghtInProgressBooks})
+            </NavLink>
+            <NavLink 
+              to={`/done`} 
+              className="tabs__link" 
+              onClick={()=>this.setActiveFilter('done')}
+              activeClassName="tabs__link--active"
+              exact
+            >
+              Done ({lenghtInDoneBooks})
+            </NavLink>
           </div>
           
           <div className="tabs__content">
