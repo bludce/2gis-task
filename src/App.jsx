@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import { BrowserRouter, Route, NavLink, Switch } from 'react-router-dom';
 import './index.sass';
 
@@ -24,12 +24,14 @@ class App extends PureComponent {
     const booksLocal = localStorage.getItem('books') !== null ? JSON.parse(localStorage.getItem('books')) : {};
     const inProgressLocal = localStorage.getItem('inProgress') !== null ? JSON.parse(localStorage.getItem('inProgress')) : {};
     const doneLocal = localStorage.getItem('done') !== null ? JSON.parse(localStorage.getItem('done')) : {};
-    const activeFilterLocal = localStorage.getItem('activeFilter') !== null ? JSON.parse(localStorage.getItem('activeFilter')) : {};
+    const activeFilterLocal = localStorage.getItem('activeFilter') !== null ? JSON.parse(localStorage.getItem('activeFilter')) : '';
+    const filtersLocal = localStorage.getItem('filters') !== null ? JSON.parse(localStorage.getItem('filters')) : [];
 
     if (localStorage.getItem('books') !== null 
         && localStorage.getItem('inProgress') !== null 
         && localStorage.getItem('done') !== null 
-        && localStorage.getItem('activeFilter') !== null) {
+        && localStorage.getItem('activeFilter') !== null
+        && localStorage.getItem('filters') !== null) {
       this.setState({
         books: {
           items: booksLocal
@@ -40,7 +42,8 @@ class App extends PureComponent {
         done: {
           items: doneLocal
         },
-        activeFilter: activeFilterLocal
+        activeFilter: activeFilterLocal,
+        filters: filtersLocal
       })
     } else {
       await this.loadPage('https://raw.githubusercontent.com/lastw/test-task/master/data/10-items.json')
@@ -48,12 +51,13 @@ class App extends PureComponent {
   }
 
   componentDidUpdate = () => {
-    const {books, inProgress, done, activeFilter} = this.state
+    const {books, inProgress, done, activeFilter, filters} = this.state
 
     localStorage.setItem('books', JSON.stringify(books.items));
     localStorage.setItem('inProgress', JSON.stringify(inProgress.items));
     localStorage.setItem('done', JSON.stringify(done.items));
     localStorage.setItem('activeFilter', JSON.stringify(activeFilter));
+    localStorage.setItem('filters', JSON.stringify(filters));
   }
 
   loadPage = async (url) => {
@@ -153,9 +157,15 @@ class App extends PureComponent {
   }
 
 
+  clear = () => {
+    this.setState({
+      filters: []
+    })
+  }
+
   render() {
 
-    const {books, inProgress, done, activeFilter} = this.state
+    const {books, inProgress, done, activeFilter, filters} = this.state
 
     const filteredBooks = this.filterBooks(activeFilter)
 
@@ -195,7 +205,17 @@ class App extends PureComponent {
               Done ({lenghtInDoneBooks})
             </NavLink>
           </div>
-          
+          {filters.length ?
+            <div className="filters-wrap">
+              <div className="filters">
+                {filters.map((tag) => {
+                  return <span className="item__tag" key={tag}>{tag}</span>
+                })}
+              </div>
+              <div className="clear" onClick={this.clear}>clear</div>
+            </div>
+            : ''
+          }
           <div className="tabs__content">
             <Switch>
               <Route path='/' exact render={
